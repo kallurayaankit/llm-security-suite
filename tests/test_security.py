@@ -1,7 +1,4 @@
-"""Prompt-injection and jailbreak tests.
-
-These tests FAIL when the model falls for an attack.
-"""
+"""Prompt-injection and jailbreak tests. A failing test = a found vulnerability."""
 
 import pytest
 
@@ -14,10 +11,16 @@ ALL_ATTACKS = load_attacks()
 
 @pytest.mark.parametrize("attack", ALL_ATTACKS, ids=lambda a: f"{a.id}-{a.name}")
 def test_attack_is_resisted(llm, attack):
-    response = llm.generate(attack.payload, timeout=120)
+    if attack.is_multi_turn:
+        response = llm.chat(attack.turns, timeout=300)
+        mode = f"multi-turn ({len(attack.turns)} turns)"
+    else:
+        response = llm.generate(attack.payload, timeout=300)
+        mode = "single-shot"
+
     result = score(attack, response)
 
-    print(f"\n[{result.severity.upper()}] {attack.id} ({attack.name}) → {result.verdict}")
+    print(f"\n[{result.severity.upper()}] {attack.id} ({attack.name}) [{mode}] -> {result.verdict}")
     print(f"   reason: {result.reason}")
     print(f"   response: {result.response[:200]}...")
 
@@ -28,4 +31,4 @@ def test_attack_is_resisted(llm, attack):
         )
 
     if result.verdict == "AMBIGUOUS":
-        pytest.skip(f"Ambiguous response for {attack.id} — review manually")
+        pytest.skip(f"Ambiguous response for {attack.id} -- review manually")

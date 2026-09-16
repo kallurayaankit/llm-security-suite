@@ -1,3 +1,5 @@
+> This repo is the **engine**. Attack definitions live in [llm-attack-corpus](https://github.com/kallurayaankit/llm-attack-corpus).
+> Clone both side by side, or set `ATTACKS_DIR` to point at the corpus.
 # llm-security-suite
 
 [![Tests](https://github.com/kallurayaankit/llm-security-suite/actions/workflows/test.yml/badge.svg)](https://github.com/kallurayaankit/llm-security-suite/actions/workflows/test.yml)
